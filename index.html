@@ -2,29 +2,36 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>GPS</title>
+  <title>Géolocalisation</title>
 </head>
 <body>
-  <p>Récupération de la position...</p>
-
+  <p>📍 Récupération de la position...</p>
   <script>
-    function sendPositionToParent(lat, lon) {
-      const coords = `${lat},${lon}`;
-      window.parent.postMessage({ gps: coords }, "*"); // Remplacer * par origine si sécurité nécessaire
+    const urlParams = new URLSearchParams(window.location.search);
+    const point = urlParams.get("point"); // récupère le point depuis l’URL
+
+    if (!point || point.length !== 9) {
+      document.body.innerHTML = "<p>❌ Code point de garde invalide.</p>";
+      throw new Error("Code point absent ou invalide.");
     }
 
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
-        position => {
-          const { latitude, longitude } = position.coords;
-          sendPositionToParent(latitude.toFixed(6), longitude.toFixed(6));
+        pos => {
+          const lat = pos.coords.latitude.toFixed(6);
+          const lon = pos.coords.longitude.toFixed(6);
+          const gps = lat + "," + lon;
+
+          // Rediriger vers LimeSurvey avec les deux variables
+          const limesurveyUrl = `https://TON-LIMESURVEY.net/123456?point=${point}&gps=${gps}`;
+          window.location.href = limesurveyUrl;
         },
         err => {
-          console.error("Erreur géolocalisation :", err.message);
+          document.body.innerHTML = "<p>❌ Erreur de géolocalisation : " + err.message + "</p>";
         }
       );
     } else {
-      console.error("Géolocalisation non supportée.");
+      document.body.innerHTML = "<p>❌ Géolocalisation non supportée sur cet appareil.</p>";
     }
   </script>
 </body>
