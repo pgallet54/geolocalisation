@@ -1,34 +1,31 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
   <meta charset="UTF-8">
-  <title>Géolocalisation Smartphone</title>
+  <title>GPS</title>
 </head>
 <body>
-  <h1>Ma Position</h1>
-  <p id="status">En attente...</p>
-  <p id="coords"></p>
+  <p>Récupération de la position...</p>
 
   <script>
-    const status = document.getElementById("status");
-    const coords = document.getElementById("coords");
+    function sendPositionToParent(lat, lon) {
+      const coords = `${lat},${lon}`;
+      window.parent.postMessage({ gps: coords }, "*"); // Remplacer * par origine si sécurité nécessaire
+    }
 
     if ("geolocation" in navigator) {
-      status.textContent = "Récupération de votre position...";
       navigator.geolocation.getCurrentPosition(
         position => {
           const { latitude, longitude } = position.coords;
-          coords.textContent = `Latitude : ${latitude}, Longitude : ${longitude}`;
-          status.textContent = "Position récupérée avec succès.";
+          sendPositionToParent(latitude.toFixed(6), longitude.toFixed(6));
         },
-        error => {
-          status.textContent = "Erreur : " + error.message;
+        err => {
+          console.error("Erreur géolocalisation :", err.message);
         }
       );
     } else {
-      status.textContent = "La géolocalisation n'est pas prise en charge.";
+      console.error("Géolocalisation non supportée.");
     }
   </script>
 </body>
 </html>
-
