@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Géolocalisation Smartphone</title>
+</head>
+<body>
+  <h1>Ma Position</h1>
+  <p id="status">En attente...</p>
+  <p id="coords"></p>
+
+  <script>
+    const status = document.getElementById("status");
+    const coords = document.getElementById("coords");
+
+    if ("geolocation" in navigator) {
+      status.textContent = "Récupération de votre position...";
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          const { latitude, longitude } = position.coords;
+          coords.textContent = `Latitude : ${latitude}, Longitude : ${longitude}`;
+          status.textContent = "Position récupérée avec succès.";
+        },
+        error => {
+          status.textContent = "Erreur : " + error.message;
+        }
+      );
+    } else {
+      status.textContent = "La géolocalisation n'est pas prise en charge.";
+    }
+  </script>
+</body>
+</html>
+
